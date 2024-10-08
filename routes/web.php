@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\API\MidtransController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,10 +15,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//Hompage
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('admin-dashboard');
 });
 
+//Dahsboard
+Route::prefix('dashboard')
+->middleware(['auth:sactum','admin'])
+->group(function(){
+    Route::get('/',[DashboardController::class, 'index'])->name('admin-dashboard');
+});
+
+//Midtrans related
+Route::get('midtrans/success', [MidtransController::class, 'success']);
+Route::get('midtrans/unfinish', [MidtransController::class, 'unfinish']);
+Route::get('midtrans/error', [MidtransController::class, 'error']);
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -25,8 +39,4 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-});
-
-Route::get('/debug-sentry', function () {
-    throw new Exception('My first Sentry error!');
 });
